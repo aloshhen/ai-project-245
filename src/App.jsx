@@ -1,17 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, useScroll, useTransform, useInView, useMotionValue, useSpring, AnimatePresence } from 'framer-motion'
-import { ArrowUpRight, Mail, MapPin, Phone } from 'lucide-react'
+import * as LucideIcons from 'lucide-react'
 
-// SafeIcon component for Lucide icons
-const SafeIcon = ({ name, size = 24, className = '', color }) => {
-  const icons = {
-    'arrow-up-right': ArrowUpRight,
-    'mail': Mail,
-    'map-pin': MapPin,
-    'phone': Phone,
+// SafeIcon Component - supports ALL Lucide icons dynamically
+const SafeIcon = ({ name, size = 24, className = '', color, strokeWidth = 2 }) => {
+  const kebabToPascal = (str) => {
+    return str
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join('')
   }
-  const IconComponent = icons[name] || (() => null)
-  return <IconComponent size={size} className={className} color={color} />
+  
+  const pascalName = kebabToPascal(name)
+  const IconComponent = LucideIcons[pascalName]
+  
+  if (!IconComponent) {
+    const FallbackIcon = LucideIcons.HelpCircle || (() => null)
+    return <FallbackIcon size={size} color={color} className={className} strokeWidth={strokeWidth} />
+  }
+  
+  return (
+    <IconComponent 
+      size={size} 
+      color={color} 
+      className={className} 
+      strokeWidth={strokeWidth}
+    />
+  )
 }
 
 // Custom Cursor with mix-blend-mode
@@ -25,7 +40,6 @@ const Cursor = () => {
   const cursorYSpring = useSpring(cursorY, springConfig)
 
   useEffect(() => {
-    // Check for touch device
     const checkTouch = () => {
       setIsTouch(window.matchMedia('(pointer: coarse)').matches)
     }
@@ -120,7 +134,7 @@ const GlitchText = ({ text, className = '' }) => {
   )
 }
 
-// Hero Section
+// Hero Section - No hardcoded bg/text classes
 const Hero = () => {
   const ref = useRef(null)
   const { scrollYProgress } = useScroll({
@@ -134,7 +148,7 @@ const Hero = () => {
   return (
     <section 
       ref={ref}
-      className="relative min-h-screen flex flex-col justify-center items-center bg-zinc-950 text-stone-50 overflow-hidden"
+      className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden"
     >
       {/* Background Image with Parallax */}
       <motion.div 
@@ -216,7 +230,7 @@ const ProjectItem = ({ number, title, image, index }) => {
   return (
     <motion.div
       ref={itemRef}
-      className="relative border-b border-zinc-900 py-8 md:py-12 cursor-none group"
+      className="relative border-b border-zinc-900/20 py-8 md:py-12 cursor-none group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onMouseMove={handleMouseMove}
@@ -233,7 +247,7 @@ const ProjectItem = ({ number, title, image, index }) => {
         <span className="text-zinc-400 font-mono text-sm md:text-base">
           {number}
         </span>
-        <h3 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight text-zinc-950 uppercase">
+        <h3 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight uppercase">
           {title}
         </h3>
         <motion.div
@@ -246,7 +260,7 @@ const ProjectItem = ({ number, title, image, index }) => {
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           className="ml-auto"
         >
-          <SafeIcon name="arrow-up-right" size={48} className="text-zinc-950" />
+          <SafeIcon name="arrow-up-right" size={48} />
         </motion.div>
       </motion.div>
 
@@ -282,7 +296,7 @@ const ProjectItem = ({ number, title, image, index }) => {
   )
 }
 
-// Selected Works Section
+// Selected Works Section - No hardcoded bg/text classes
 const SelectedWorks = () => {
   const projects = [
     {
@@ -313,7 +327,7 @@ const SelectedWorks = () => {
   ]
 
   return (
-    <section className="min-h-screen bg-stone-50 text-zinc-950 py-24 md:py-32 px-6 md:px-12">
+    <section className="min-h-screen py-24 md:py-32 px-6 md:px-12">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -330,7 +344,7 @@ const SelectedWorks = () => {
           </h2>
         </motion.div>
 
-        <div className="border-t border-zinc-900">
+        <div className="border-t border-zinc-900/20">
           {projects.map((project, index) => (
             <ProjectItem
               key={project.number}
@@ -346,7 +360,7 @@ const SelectedWorks = () => {
   )
 }
 
-// Philosophy Section with terminal-like reveal
+// Philosophy Section with terminal-like reveal - No hardcoded bg/text classes
 const Philosophy = () => {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-200px' })
@@ -368,7 +382,7 @@ const Philosophy = () => {
   return (
     <section 
       ref={ref}
-      className="min-h-screen bg-zinc-950 text-stone-50 py-24 md:py-32 px-6 md:px-12 flex items-center"
+      className="min-h-screen py-24 md:py-32 px-6 md:px-12 flex items-center"
     >
       <div className="max-w-5xl mx-auto w-full">
         <motion.div
@@ -396,7 +410,7 @@ const Philosophy = () => {
               transition={{ delay: index * 0.15, duration: 0.1 }}
             >
               <motion.p
-                className={`${line === '' ? 'h-8' : ''} ${line.startsWith('OUR') ? 'text-zinc-400 mt-8' : ''}`}
+                className={`${line === '' ? 'h-8' : ''} ${line.startsWith('OUR') ? 'text-zinc-500 mt-8' : ''}`}
                 initial={{ y: '100%' }}
                 animate={isInView ? { y: 0 } : { y: '100%' }}
                 transition={{ 
@@ -414,7 +428,7 @@ const Philosophy = () => {
           
           {/* Blinking cursor */}
           <motion.span
-            className="inline-block w-3 h-6 md:h-8 bg-stone-50 mt-4"
+            className="inline-block w-3 h-6 md:h-8 bg-current mt-4"
             animate={{ opacity: [1, 0] }}
             transition={{ repeat: Infinity, duration: 0.8, ease: 'steps(2)' }}
           />
@@ -424,12 +438,12 @@ const Philosophy = () => {
   )
 }
 
-// Contact Section
+// Contact Section - No hardcoded bg/text classes
 const Contact = () => {
   const [isHovered, setIsHovered] = useState(false)
 
   return (
-    <section className="min-h-screen bg-stone-50 text-zinc-950 py-24 md:py-32 px-6 md:px-12 flex flex-col justify-center">
+    <section className="min-h-screen py-24 md:py-32 px-6 md:px-12 flex flex-col justify-center telegram-safe-bottom">
       <div className="max-w-7xl mx-auto w-full">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -457,7 +471,6 @@ const Contact = () => {
             className="text-4xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter break-all md:break-normal"
             animate={{ 
               x: isHovered ? 20 : 0,
-              color: isHovered ? '#71717a' : '#09090b'
             }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
@@ -474,7 +487,7 @@ const Contact = () => {
             }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           >
-            <SafeIcon name="arrow-up-right" size={80} className="text-zinc-950" />
+            <SafeIcon name="arrow-up-right" size={80} />
           </motion.div>
         </motion.a>
 
@@ -506,13 +519,13 @@ const Contact = () => {
 
         {/* Copyright */}
         <motion.div
-          className="mt-24 pt-8 border-t border-zinc-200"
+          className="mt-24 pt-8 border-t border-zinc-900/20"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.6 }}
         >
-          <p className="text-zinc-400 text-sm font-mono">
+          <p className="text-zinc-500 text-sm font-mono">
             © 2024 STRUCTURES OF VOID. All rights reserved.
           </p>
         </motion.div>
@@ -569,7 +582,7 @@ function App() {
       {/* Custom Cursor */}
       <Cursor />
 
-      {/* Main Content */}
+      {/* Main Content with dynamic theme */}
       <motion.main
         ref={mainRef}
         className="relative"
